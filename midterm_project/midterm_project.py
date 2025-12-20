@@ -63,10 +63,10 @@ def main_menu():
 # Team management
 def team_management_menu():
     while True:
-        print("\n--- team_management---")
-        print("1.add member")
-        print("2.display all member")
-        print("3.Main menu")
+        print("\n--- Team Management ---")
+        print("1. Add member")
+        print("2. Display all members")
+        print("3. Back to main menu")
         choice = input("Enter: ").strip()
 
         if choice == '1':
@@ -76,35 +76,34 @@ def team_management_menu():
         elif choice == '3':
             break
         else:
-            print("Not valid")
-
+            print("Invalid choice")
 
 def add_team_member():
-    print("\n---add team member---")
-    name = input("name: ").strip()
-    role = input("role: ").strip()
+    print("\n--- Add Team Member ---")
+    name = input("Name: ").strip()
+    role = input("Role: ").strip()
     email = input("Email: ").strip()
 
     team_members.append(TeamMember(name, role, email))
-    print(f"succesfully")
+    print("Member added successfully!")
 
 def display_team_members():
-    print("\n---List of team member ---")
+    print("\n--- List of Team Members ---")
     if not team_members:
-        print("empty")
+        print("No members yet.")
         return
     for idx, member in enumerate(team_members, start=1):
-        print(f"{idx}. name: {member.name}")
-        print(f" role: {member.role}")
-        print(f"  Email: {member.email}")
+        print(f"{idx}. Name: {member.name}")
+        print(f"   Role: {member.role}")
+        print(f"   Email: {member.email}")
         print("   " + "-"*20)
 
 def projects_management_menu():
     while True:
-        print("\n--- project management ---")
-        print("1.Create new project")
-        print("2.Display all project")
-        print("3.Main menu")
+        print("\n--- Project Management ---")
+        print("1. Create new project")
+        print("2. Display all projects")
+        print("3. Back to main menu")
         choice = input("Enter: ").strip()
 
         if choice == '1':
@@ -114,57 +113,55 @@ def projects_management_menu():
         elif choice == '3':
             break
         else:
-            print("Not valid")
-
+            print("Invalid choice")
 
 def add_project():
-    print("\n---Creat New Project ---")
-    name = input("name:").strip()
-    description = input("Discription:").strip()
+    print("\n--- Create New Project ---")
+    name = input("Project name: ").strip()
+    description = input("Description: ").strip()
 
     if not team_members:
-        print("Error.. you muust add at least one team member first")
+        print("Error: You must add at least one team member first!")
         return
 
-    print("the management must be one of these")
+    print("The manager must be one of these:")
     for idx, member in enumerate(team_members, start=1):
         print(f"   {idx}. {member.name} ({member.role})")
 
-    manager = input("neme of manager: ").strip()
+    manager = input("Name of manager: ").strip()
 
     if not any(member.name == manager for member in team_members):
-        print("Not found")
+        print("Manager not found!")
         return
 
-    start_date_str = input("statr date: ").strip()
-    end_date_str = input("end date").strip()
+    start_date_str = input("Start date (YYYY-MM-DD): ").strip()
+    end_date_str = input("End date (YYYY-MM-DD): ").strip()
 
     try:
         start_date = datetime.date.fromisoformat(start_date_str)
         end_date = datetime.date.fromisoformat(end_date_str)
         if start_date > end_date:
-            print("start date can not be after end date")
+            print("Start date cannot be after end date!")
             return
     except ValueError:
-        print("wrong format")
+        print("Invalid date format!")
         return
 
     projects.append(Project(name, description, manager, start_date, end_date))
-    print(f"Succesfully")
-
+    print("Project created successfully!")
 
 def display_projects():
-    print("\n--- List all project ---")
+    print("\n--- List of Projects ---")
     if not projects:
-       print("not project yet")
-       return
+        print("No projects yet.")
+        return
 
     for idx, project in enumerate(projects, start=1):
-        print(f"{idx}. name project: {project.name}")
-        print(f"   discription {project.description}")
-        print(f"   manager: {project.manager}")
-        print(f"   start date: {project.start_date}")
-        print(f"   end date: {project.end_date}")
+        print(f"{idx}. Project name: {project.name}")
+        print(f"   Description: {project.description}")
+        print(f"   Manager: {project.manager}")
+        print(f"   Start date: {project.start_date}")
+        print(f"   End date: {project.end_date}")
         print("   " + "-"*30)
 
 # Task management
@@ -340,7 +337,7 @@ def reports():
                             if task.assignee == member.name and task.status != "Done":
                                 active += 1
                     f.write(f"{member.name}: Active Tasks: {active}\n")
-            print("report.txt file generated.")
+            print("report.txt file generated successfully.")
         elif choice == "6":
             return
         else:

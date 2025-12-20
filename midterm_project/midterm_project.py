@@ -85,11 +85,7 @@ def add_team_member():
     role = input("role: ").strip()
     email = input("Email: ").strip()
 
-    team_members.append({
-        'name': name,
-        'role': role,
-        'email': email
-    })
+    team_members.append(TeamMember(name, role, email))
     print(f"succesfully")
 
 def display_team_members():
@@ -98,9 +94,9 @@ def display_team_members():
         print("empty")
         return
     for idx, member in enumerate(team_members, start=1):
-        print(f"{idx}. name: {member['name']}")
-        print(f" role: {member['role']}")
-        print(f"  Email: {member['email']}")
+        print(f"{idx}. name: {member.name}")
+        print(f" role: {member.role}")
+        print(f"  Email: {member.email}")
         print("   " + "-"*20)
 
 def projects_management_menu():
@@ -132,11 +128,11 @@ def add_project():
 
     print("the management must be one of these")
     for idx, member in enumerate(team_members, start=1):
-        print(f"   {idx}. {member['name']} ({member['role']})")
+        print(f"   {idx}. {member.name} ({member.role})")
 
     manager = input("neme of manager: ").strip()
 
-    if not any(member['name'] == manager for member in team_members):
+    if not any(member.name == manager for member in team_members):
         print("Not found")
         return
 
@@ -153,13 +149,7 @@ def add_project():
         print("wrong format")
         return
 
-    projects.append({
-        'name': name,
-        'description': description,
-        'manager': manager,
-        'start_date': start_date,
-        'end_date': end_date
-    })
+    projects.append(Project(name, description, manager, start_date, end_date))
     print(f"Succesfully")
 
 
@@ -170,11 +160,11 @@ def display_projects():
        return
 
     for idx, project in enumerate(projects, start=1):
-        print(f"{idx}. name project: {project['name']}")
-        print(f"   discription {project['description']}")
-        print(f"   manager: {project['manager']}")
-        print(f"   start date: {project['start_date']}")
-        print(f"   end date: {project['end_date']}")
+        print(f"{idx}. name project: {project.name}")
+        print(f"   discription {project.description}")
+        print(f"   manager: {project.manager}")
+        print(f"   start date: {project.start_date}")
+        print(f"   end date: {project.end_date}")
         print("   " + "-"*30)
 
 # Task management

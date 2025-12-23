@@ -353,5 +353,4 @@ def generate_report_file(today):
             f.write(f"{member.name}: Active Tasks: {active}\n")
     print("report.txt file generated successfully.")
 
-if __name__ == "__main__":
-    main_menu()
+main_menu()

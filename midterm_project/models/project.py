@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class Project:
     def __init__(self, name, description, manager, start_date, end_date):
         self.name = name
@@ -12,6 +14,6 @@ class Project:
             "name": self.name,
             "description": self.description,
             "manager": self.manager,
-            "start_date": self.start_date,
-            "end_date": self.end_date
+            "start_date": self.start_date.isoformat(),
+            "end_date": self.end_date.isoformat()
         }

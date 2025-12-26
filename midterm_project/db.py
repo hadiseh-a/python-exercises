@@ -1,64 +1,91 @@
+# database.py
+
 from pymongo import MongoClient
+from datetime import date
 from models import TeamMember, Project, Task
 
-# ←←← لینک MongoDB خودت رو اینجا عوض کن ←←←
-MONGO_URI = "mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/"  # یا "mongodb://localhost:27017/"
+MONGO_URI = "mongodb+srv://hadisea82:jwtDaLN2SUBpKLt@cluster0.vmincra.mongodb.net/" 
 
 client = MongoClient(MONGO_URI)
-db = client["project_db"]
+db = client["project_db"]               # اسم دیتابیس (می‌تونی عوض کنی)
 members_col = db["members"]
 projects_col = db["projects"]
 tasks_col = db["tasks"]
 
 def load_data():
+    """
+    همه داده‌ها رو از MongoDB لود می‌کنه و به صورت شیءهای مدل برمی‌گردونه
+    """
     members = []
     projects = []
 
-    # لود اعضا
+    # لود اعضای تیم
     for doc in members_col.find({}, {"_id": 0}):
-        members.append(TeamMember(doc["name"], doc["role"], doc["email"]))
+        members.append(TeamMember(
+            name=doc["name"],
+            role=doc["role"],
+            email=doc["email"]
+        ))
 
     # لود پروژه‌ها
     for proj_doc in projects_col.find({}, {"_id": 0}):
-        proj = Project(
-            proj_doc["name"],
-            proj_doc["description"],
-            proj_doc["manager"],
-            proj_doc["start_date"],
-            proj_doc["end_date"]
+        project = Project(
+            name=proj_doc["name"],
+            description=proj_doc["description"],
+            manager=proj_doc["manager"],
+            start_date=date.fromisoformat(proj_doc["start_date"]),
+            end_date=date.fromisoformat(proj_doc["end_date"])
         )
-        # لود تسک‌ها
-        for task_doc in tasks_col.find({"project_name": proj.name}, {"_id": 0}):
+
+        # لود تسک‌های مربوط به این پروژه
+        for task_doc in tasks_col.find({"project_name": project.name}, {"_id": 0}):
             task = Task(
-                task_doc["title"],
-                task_doc["description"],
-                task_doc["assignee"],
-                task_doc["deadline"],
-                task_doc.get("status", "ToDo")
+                title=task_doc["title"],
+                description=task_doc["description"],
+                assignee=task_doc["assignee"],
+                deadline=date.fromisoformat(task_doc["deadline"]),
+                status=task_doc.get("status", "ToDo")
             )
-            proj.tasks.append(task)
-        projects.append(proj)
+            project.tasks.append(task)
+
+        projects.append(project)
 
     return members, projects
 
 def save_member(member: TeamMember):
+    """عضو جدید رو در دیتابیس ذخیره می‌کنه"""
     members_col.insert_one(member.to_dict())
 
 def save_project(project: Project):
-    projects_col.insert_one(project.to_dict())
+    """پروژه جدید رو در دیتابیس ذخیره می‌کنه"""
+    projects_col.insert_one({
+        "name": project.name,
+        "description": project.description,
+        "manager": project.manager,
+        "start_date": project.start_date.isoformat(),
+        "end_date": project.end_date.isoformat()
+    })
 
 def save_task(task: Task, project_name: str):
-    task_dict = task.to_dict()
-    task_dict["project_name"] = project_name
-    tasks_col.insert_one(task_dict)
+    """تسک جدید رو در دیتابیس ذخیره می‌کنه"""
+    tasks_col.insert_one({
+        "project_name": project_name,
+        "title": task.title,
+        "description": task.description,
+        "assignee": task.assignee,
+        "deadline": task.deadline.isoformat(),
+        "status": task.status
+    })
 
 def update_task_status(project_name: str, task_title: str, new_status: str):
+    """وضعیت یک تسک رو آپدیت می‌کنه"""
     tasks_col.update_one(
         {"project_name": project_name, "title": task_title},
         {"$set": {"status": new_status}}
     )
 
 def update_task_assignee(project_name: str, task_title: str, new_assignee: str):
+    """مسئول یک تسک رو تغییر می‌ده"""
     tasks_col.update_one(
         {"project_name": project_name, "title": task_title},
         {"$set": {"assignee": new_assignee}}

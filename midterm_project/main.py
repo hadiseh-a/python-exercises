@@ -1,31 +1,10 @@
 import datetime
 import sys
+from models import TeamMember, Project, Task
+from db import load_data, save_member, save_project, save_task, update_task_status, update_task_assignee
 
-class TeamMember:
-    def __init__(self, name, role, email):
-        self.name = name
-        self.role = role
-        self.email = email
-
-class Project:
-    def __init__(self, name, description, manager, start_date, end_date):
-        self.name = name
-        self.description = description
-        self.manager = manager
-        self.start_date = start_date
-        self.end_date = end_date
-        self.tasks = []
-
-class Task:
-    def __init__(self, title, description, assignee, deadline, status="ToDo"):
-        self.title = title
-        self.description = description
-        self.assignee = assignee
-        self.deadline = deadline
-        self.status = status
-
-team_members = []
-projects = []
+# لود داده‌ها از دیتابیس
+team_members, projects = load_data()
 
 def main_menu():
     while True:
@@ -46,7 +25,8 @@ def main_menu():
         elif choice == "4":
             reports_menu()
         elif choice == "5":
-            sys.exit("Goodbye!")
+            print("Goodbye!")
+            sys.exit()
         else:
             print("Invalid choice!")
 
@@ -72,7 +52,9 @@ def add_team_member():
     name = input("Name: ").strip()
     role = input("Role: ").strip()
     email = input("Email: ").strip()
-    team_members.append(TeamMember(name, role, email))
+    member = TeamMember(name, role, email)
+    save_member(member)
+    team_members.append(member)
     print("Member added successfully!")
 
 def display_team_members():
@@ -118,7 +100,7 @@ def add_project():
 
     manager = input("Name of manager: ").strip()
 
-    if not any(member.name == manager for member in team_members):
+    if not any(m.name == manager for m in team_members):
         print("Manager not found!")
         return
 
@@ -135,7 +117,9 @@ def add_project():
         print("Invalid date format!")
         return
 
-    projects.append(Project(name, description, manager, start_date, end_date))
+    project = Project(name, description, manager, start_date, end_date)
+    save_project(project)
+    projects.append(project)
     print("Project created successfully!")
 
 def display_projects():
@@ -201,6 +185,7 @@ def create_task():
         print("Invalid status!")
         return
     task = Task(title, description, assignee, deadline, status)
+    save_task(task, proj_name)
     proj.tasks.append(task)
     print("Task created.")
 
@@ -218,6 +203,7 @@ def change_task_status():
     new_status = input("New Status (ToDo/In Progress/Done): ").strip()
     if new_status in ["ToDo", "In Progress", "Done"]:
         task.status = new_status
+        update_task_status(proj_name, title, new_status)
         print("Status changed.")
     else:
         print("Invalid status!")
@@ -236,6 +222,7 @@ def reassign_task():
     new_assignee = input("New Assignee (Member Name): ").strip()
     if any(m.name == new_assignee for m in team_members):
         task.assignee = new_assignee
+        update_task_assignee(proj_name, title, new_assignee)
         print("Assignee changed.")
     else:
         print("Member not found!")
@@ -353,4 +340,6 @@ def generate_report_file(today):
             f.write(f"{member.name}: Active Tasks: {active}\n")
     print("report.txt file generated successfully.")
 
-main_menu()
+if __name__ == "__main__":
+    print("Loading data from MongoDB...")
+    main_menu()

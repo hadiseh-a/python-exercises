@@ -1,5 +1,3 @@
-# database.py
-
 from pymongo import MongoClient
 from datetime import date
 from models import TeamMember, Project, Task
@@ -7,7 +5,7 @@ from models import TeamMember, Project, Task
 MONGO_URI = "mongodb+srv://hadisea82:jwtDaLN2SUBpKLt@cluster0.vmincra.mongodb.net/" 
 
 client = MongoClient(MONGO_URI)
-db = client["project_db"]               # اسم دیتابیس (می‌تونی عوض کنی)
+db = client["project_db"]            
 members_col = db["members"]
 projects_col = db["projects"]
 tasks_col = db["tasks"]

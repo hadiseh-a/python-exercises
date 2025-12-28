@@ -1,345 +1,430 @@
 import datetime
-import sys
 from models import TeamMember, Project, Task
-from db import load_data, save_member, save_project, save_task, update_task_status, update_task_assignee
+from db import (
+    load_data, save_member, save_project, save_task,
+    update_task_status, update_task_assignee
+)
 
-# لود داده‌ها از دیتابیس
+TODAY = datetime.date.today().strftime("%Y-%m-%d")
+
 team_members, projects = load_data()
+
+
+def input_non_empty(message):
+    text = input(message).strip()
+    if text == "":
+        return None
+    return text
+
+
+def input_date(message):
+    d = input(message).strip()
+    if len(d) != 10:
+        return None
+    return d
+
+
+def choose_from_list(items, title, show_item_func):
+    if not items:
+        print("List is empty.")
+        return None
+
+    print("\n" + title)
+    for i, item in enumerate(items, start=1):
+        print(f"{i}. {show_item_func(item)}")
+
+    choice = input("Enter number: ").strip()
+    if not choice.isdigit():
+        print("Invalid input.")
+        return None
+
+    idx = int(choice)
+    if idx < 1 or idx > len(items):
+        print("Invalid number.")
+        return None
+
+    return items[idx - 1]
+
+
+def find_project_by_name(name):
+    for p in projects:
+        if p.name == name:
+            return p
+    return None
+
+#Zeynab Nezami
 
 def main_menu():
     while True:
-        print("\nMain Menu:")
-        print("1. Team Member Management")
-        print("2. Project Management")
-        print("3. Task Management")
-        print("4. Reports")
-        print("5. Exit")
+        print("\n" + "=" * 40)
+        print("   PROJECT MANAGEMENT SYSTEM")
+        print("=" * 40)
+        print("1) Team members")
+        print("2) Projects")
+        print("3) Tasks")
+        print("4) Reports")
+        print("5) Exit")
+
         choice = input("Choose: ").strip()
-        
+
         if choice == "1":
-            team_management_menu()
+            team_menu()
         elif choice == "2":
-            projects_management_menu()
+            projects_menu()
         elif choice == "3":
-            task_management_menu()
+            tasks_menu()
         elif choice == "4":
             reports_menu()
         elif choice == "5":
             print("Goodbye!")
-            sys.exit()
-        else:
-            print("Invalid choice!")
-
-def team_management_menu():
-    while True:
-        print("\n--- Team Management ---")
-        print("1. Add member")
-        print("2. Display all members")
-        print("3. Back to main menu")
-        choice = input("Enter: ").strip()
-
-        if choice == '1':
-            add_team_member()
-        elif choice == '2':
-            display_team_members()
-        elif choice == '3':
             break
         else:
-            print("Invalid choice")
+            print("Invalid choice.")
 
-def add_team_member():
-    print("\n--- Add Team Member ---")
-    name = input("Name: ").strip()
-    role = input("Role: ").strip()
-    email = input("Email: ").strip()
-    member = TeamMember(name, role, email)
-    save_member(member)
-    team_members.append(member)
-    print("Member added successfully!")
 
-def display_team_members():
-    print("\n--- List of Team Members ---")
-    if not team_members:
-        print("No members yet.")
-        return
-    for idx, member in enumerate(team_members, start=1):
-        print(f"{idx}. Name: {member.name}")
-        print(f"   Role: {member.role}")
-        print(f"   Email: {member.email}")
-        print("   " + "-"*20)
-
-def projects_management_menu():
+def team_menu():
     while True:
-        print("\n--- Project Management ---")
-        print("1. Create new project")
-        print("2. Display all projects")
-        print("3. Back to main menu")
-        choice = input("Enter: ").strip()
+        print("\n--- Team Members ---")
+        print("1) Add member")
+        print("2) Show members")
+        print("3) Back")
 
-        if choice == '1':
-            add_project()
-        elif choice == '2':
-            display_projects()
-        elif choice == '3':
-            break
-        else:
-            print("Invalid choice")
-
-def add_project():
-    print("\n--- Create New Project ---")
-    name = input("Project name: ").strip()
-    description = input("Description: ").strip()
-
-    if not team_members:
-        print("Error: You must add at least one team member first!")
-        return
-
-    print("The manager must be one of these:")
-    for idx, member in enumerate(team_members, start=1):
-        print(f"   {idx}. {member.name} ({member.role})")
-
-    manager = input("Name of manager: ").strip()
-
-    if not any(m.name == manager for m in team_members):
-        print("Manager not found!")
-        return
-
-    start_date_str = input("Start date (YYYY-MM-DD): ").strip()
-    end_date_str = input("End date (YYYY-MM-DD): ").strip()
-
-    try:
-        start_date = datetime.date.fromisoformat(start_date_str)
-        end_date = datetime.date.fromisoformat(end_date_str)
-        if start_date > end_date:
-            print("Start date cannot be after end date!")
-            return
-    except ValueError:
-        print("Invalid date format!")
-        return
-
-    project = Project(name, description, manager, start_date, end_date)
-    save_project(project)
-    projects.append(project)
-    print("Project created successfully!")
-
-def display_projects():
-    print("\n--- List of Projects ---")
-    if not projects:
-        print("No projects yet.")
-        return
-
-    for idx, project in enumerate(projects, start=1):
-        print(f"{idx}. Project name: {project.name}")
-        print(f"   Description: {project.description}")
-        print(f"   Manager: {project.manager}")
-        print(f"   Start date: {project.start_date}")
-        print(f"   End date: {project.end_date}")
-        print("   " + "-"*30)
-
-def task_management_menu():
-    while True:
-        print("\n--- Task Management ---")
-        print("1. Create New Task")
-        print("2. Change Task Status")
-        print("3. Change Task Assignee")
-        print("4. Display Tasks for a Project")
-        print("5. Display Tasks for a Member")
-        print("6. Back to main menu")
         choice = input("Choose: ").strip()
 
         if choice == "1":
-            create_task()
+            add_member()
+        elif choice == "2":
+            show_members()
+        elif choice == "3":
+            break
+        else:
+            print("Invalid choice.")
+
+
+def add_member():
+    name = input_non_empty("Name: ")
+    if name is None:
+        print("Name is required.")
+        return
+
+    role = input("Role: ").strip()
+    if role == "":
+        role = "Not specified"
+
+    email = input("Email: ").strip()
+
+    member = TeamMember(name, role, email)
+    save_member(member)
+    team_members.append(member)
+
+    print("Member added.")
+
+
+def show_members():
+    if not team_members:
+        print("No members found.")
+        return
+
+    for i, m in enumerate(team_members, start=1):
+        print(f"{i}.name: {m.name} |role: {m.role} |email: {m.email}")
+
+
+def projects_menu():
+    while True:
+        print("\n--- Projects ---")
+        print("1) Create project")
+        print("2) Show projects")
+        print("3) Back")
+
+        choice = input("Choose: ").strip()
+
+        if choice == "1":
+            create_project()
+        elif choice == "2":
+            show_projects()
+        elif choice == "3":
+            break
+        else:
+            print("Invalid choice.")
+
+
+def create_project():
+    if not team_members:
+        print("Add a team member first.")
+        return
+
+    pname = input_non_empty("Project name: ")
+    if pname is None:
+        print("Project name is required.")
+        return
+
+    desc = input("Description: ").strip()
+    if desc == "":
+        desc = "(no description)"
+
+    manager = choose_from_list(
+        team_members,
+        "Select project manager:",
+        lambda m: f"{m.name} ({m.role})"
+    )
+    if manager is None:
+        return
+
+    start = input_date("Start date (YYYY-MM-DD): ")
+    end = input_date("End date (YYYY-MM-DD): ")
+    if start is None or end is None or start > end:
+        print("Invalid date.")
+        return
+
+    project = Project(pname, desc, manager.name, start, end)
+    save_project(project)
+    projects.append(project)
+
+    print("Project created.")
+
+
+def show_projects():
+    if not projects:
+        print("No projects found.")
+        return
+
+    for i, p in enumerate(projects, start=1):
+        print(f"{i}.name: {p.name} | Manager: {p.manager}")
+        print(f"description:  {p.description}")
+        print(f"deadline:  {p.start_date} -> {p.end_date}")
+
+#Narges
+
+def tasks_menu():
+    while True:
+        print("\n--- Tasks ---")
+        print("1) Add task")
+        print("2) Change status")
+        print("3) Reassign task")
+        print("4) Project tasks")
+        print("5) Member tasks")
+        print("6) Back")
+
+        choice = input("Choose: ").strip()
+
+        if choice == "1":
+            add_task()
         elif choice == "2":
             change_task_status()
         elif choice == "3":
             reassign_task()
         elif choice == "4":
-            display_tasks_for_project()
+            show_tasks_for_project()
         elif choice == "5":
-            display_tasks_for_member()
+            show_tasks_for_member()
         elif choice == "6":
             break
         else:
-            print("Invalid choice!")
+            print("Invalid choice.")
 
-def create_task():
-    proj_name = input("Project Name: ").strip()
-    proj = next((p for p in projects if p.name == proj_name), None)
-    if not proj:
-        print("Project not found!")
+
+def add_task():
+    project = choose_from_list(projects, "Select project:", lambda p: p.name)
+    if project is None:
         return
-    title = input("Task Title: ").strip()
-    description = input("Short Description: ").strip()
-    assignee = input("Assignee (Member Name): ").strip()
-    if not any(m.name == assignee for m in team_members):
-        print("Member not found!")
+
+    title = input_non_empty("Task title: ")
+    if title is None:
+        print("Task title is required.")
         return
-    deadline_str = input("Deadline (YYYY-MM-DD): ").strip()
-    try:
-        deadline = datetime.date.fromisoformat(deadline_str)
-    except ValueError:
-        print("Invalid date!")
+
+    desc = input("Description: ").strip()
+    if desc == "":
+        desc = "None"
+
+    assignee = choose_from_list(team_members, "Select assignee:", lambda m: m.name)
+    if assignee is None:
         return
-    status = input("Status (ToDo/In Progress/Done): ").strip() or "ToDo"
+
+    deadline = input_date("Deadline (YYYY-MM-DD): ")
+    if deadline is None:
+        print("Invalid date.")
+        return
+
+    status = input("Status [ToDo]: ").strip()
     if status not in ["ToDo", "In Progress", "Done"]:
-        print("Invalid status!")
-        return
-    task = Task(title, description, assignee, deadline, status)
-    save_task(task, proj_name)
-    proj.tasks.append(task)
-    print("Task created.")
+        status = "ToDo"
+
+    task = Task(title, desc, assignee.name, deadline, status)
+    save_task(task, project.name)
+    project.tasks.append(task)
+
+    print("Task added.")
+
+
+def pick_task():
+    project = choose_from_list(projects, "Select project:", lambda p: p.name)
+    if project is None or not project.tasks:
+        return None, None
+
+    task = choose_from_list(
+        project.tasks,
+        "Select task:",
+        lambda t: f"title: {t.title} |assignee: {t.assignee} |status: {t.status}"
+    )
+    return project, task
+
 
 def change_task_status():
-    proj_name = input("Project Name: ").strip()
-    proj = next((p for p in projects if p.name == proj_name), None)
-    if not proj:
-        print("Project not found!")
+    project, task = pick_task()
+    if project is None:
         return
-    title = input("Task Title: ").strip()
-    task = next((t for t in proj.tasks if t.title == title), None)
-    if not task:
-        print("Task not found!")
+
+    status = input("New status: ToDo, In Progress, Done ").strip()
+    if status not in ["ToDo", "In Progress", "Done"]:
+        print("Invalid status.")
         return
-    new_status = input("New Status (ToDo/In Progress/Done): ").strip()
-    if new_status in ["ToDo", "In Progress", "Done"]:
-        task.status = new_status
-        update_task_status(proj_name, title, new_status)
-        print("Status changed.")
-    else:
-        print("Invalid status!")
+
+    task.status = status
+    update_task_status(project.name, task.title, status)
+
+    print("Status updated.")
+
 
 def reassign_task():
-    proj_name = input("Project Name: ").strip()
-    proj = next((p for p in projects if p.name == proj_name), None)
-    if not proj:
-        print("Project not found!")
+    project, task = pick_task()
+    if project is None:
         return
-    title = input("Task Title: ").strip()
-    task = next((t for t in proj.tasks if t.title == title), None)
-    if not task:
-        print("Task not found!")
-        return
-    new_assignee = input("New Assignee (Member Name): ").strip()
-    if any(m.name == new_assignee for m in team_members):
-        task.assignee = new_assignee
-        update_task_assignee(proj_name, title, new_assignee)
-        print("Assignee changed.")
-    else:
-        print("Member not found!")
 
-def display_tasks_for_project():
-    proj_name = input("Project Name: ").strip()
-    proj = next((p for p in projects if p.name == proj_name), None)
-    if not proj:
-        print("Project not found!")
+    member = choose_from_list(team_members, "Select new assignee:", lambda m: m.name)
+    if member is None:
         return
-    if not proj.tasks:
-        print("No tasks.")
-    else:
-        for task in proj.tasks:
-            print(f"Title: {task.title}, Description: {task.description}, Assignee: {task.assignee}, Deadline: {task.deadline}, Status: {task.status}")
 
-def display_tasks_for_member():
-    member_name = input("Member Name: ").strip()
+    task.assignee = member.name
+    update_task_assignee(project.name, task.title, member.name)
+
+    print("Task reassigned.")
+
+
+def show_tasks_for_project():
+    project = choose_from_list(projects, "Select project:", lambda p: p.name)
+    if project is None:
+        return
+
+    if not project.tasks:
+        print("No tasks found.")
+        return
+
+    for t in project.tasks:
+        print(f"title: {t.title} |assignee: {t.assignee} |deadline: {t.deadline} |status: {t.status}")
+
+
+def show_tasks_for_member():
+    member = choose_from_list(team_members, "Select member:", lambda m: m.name)
+    if member is None:
+        return
+
     found = False
-    for proj in projects:
-        for task in proj.tasks:
-            if task.assignee == member_name:
-                print(f"Project: {proj.name}, Title: {task.title}, Deadline: {task.deadline}, Status: {task.status}")
+    for p in projects:
+        for t in p.tasks:
+            if t.assignee == member.name:
+                print(f"[project name: {p.name}] task title: {t.title} |task deadline: {t.deadline} |task status: {t.status}")
                 found = True
-    if not found:
-        print("No tasks for this member.")
 
+    if not found:
+        print("No tasks found.")
+
+#Setayesh Mokhtari
+ 
 def reports_menu():
-    today = datetime.date.today()
     while True:
         print("\n--- Reports ---")
-        print("1. Display Overdue Tasks")
-        print("2. Display Member Status Summary")
-        print("3. Display Project Status Summary")
-        print("4. Display Tasks with Near Deadlines")
-        print("5. Generate Report File")
-        print("6. Back to main menu")
+        print("1) Overdue tasks")
+        print("2) Member summary")
+        print("3) Project status")
+        print("4) Upcoming tasks")
+        print("5) Export report")
+        print("6) Back")
+
         choice = input("Choose: ").strip()
 
         if choice == "1":
-            display_overdue_tasks(today)
+            report_overdue()
         elif choice == "2":
-            display_member_summary()
+            report_member_summary()
         elif choice == "3":
-            display_project_summary()
+            report_project_status()
         elif choice == "4":
-            display_near_deadline_tasks(today)
+            report_upcoming()
         elif choice == "5":
-            generate_report_file(today)
+            export_full_report()
         elif choice == "6":
             break
         else:
-            print("Invalid choice!")
+            print("Invalid choice.")
 
-def display_overdue_tasks(today):
+
+def report_overdue():
     found = False
-    for proj in projects:
-        for task in proj.tasks:
-            if task.deadline < today and task.status != "Done":
-                print(f"Project: {proj.name}, Title: {task.title}, Assignee: {task.assignee}, Deadline: {task.deadline}")
+    for p in projects:
+        for t in p.tasks:
+            if t.deadline < TODAY and t.status != "Done":
+                print(f"project name:{p.name} -> task title: {t.title} (deadline: {t.deadline})")
                 found = True
     if not found:
         print("No overdue tasks.")
 
-def display_member_summary():
-    member_name = input("Member Name: ").strip()
-    todo = in_progress = done = 0
-    for proj in projects:
-        for task in proj.tasks:
-            if task.assignee == member_name:
-                if task.status == "ToDo":
+
+def report_member_summary():
+    member = choose_from_list(team_members, "Select member:", lambda m: m.name)
+    if member is None:
+        return
+
+    todo = prog = done = 0
+    for p in projects:
+        for t in p.tasks:
+            if t.assignee == member.name:
+                if t.status == "ToDo":
                     todo += 1
-                elif task.status == "In Progress":
-                    in_progress += 1
-                elif task.status == "Done":
+                elif t.status == "In Progress":
+                    prog += 1
+                else:
                     done += 1
-    print(f"{member_name}: ToDo: {todo}, In Progress: {in_progress}, Done: {done}")
 
-def display_project_summary():
-    for proj in projects:
-        todo = sum(1 for t in proj.tasks if t.status == "ToDo")
-        in_progress = sum(1 for t in proj.tasks if t.status == "In Progress")
-        done = sum(1 for t in proj.tasks if t.status == "Done")
-        print(f"Project {proj.name}: ToDo: {todo}, In Progress: {in_progress}, Done: {done}")
+    print(f"ToDo: {todo}")
+    print(f"In Progress: {prog}")
+    print(f"Done: {done}")
 
-def display_near_deadline_tasks(today):
-    near_deadline = today + datetime.timedelta(days=3)
+
+def report_project_status():
+    for p in projects:
+        total = len(p.tasks)
+        done = sum(1 for t in p.tasks if t.status == "Done")
+        print(f"{p.name}:done: {done}/total:{total}")
+
+
+def report_upcoming():
+    today = datetime.date.today()
+    upcoming = [
+        (today + datetime.timedelta(days=i)).strftime("%Y-%m-%d")
+        for i in range(1, 4)
+    ]
+
     found = False
-    for proj in projects:
-        for task in proj.tasks:
-            if today < task.deadline <= near_deadline and task.status != "Done":
-                print(f"Project: {proj.name}, Title: {task.title}, Assignee: {task.assignee}, Deadline: {task.deadline}")
+    for p in projects:
+        for t in p.tasks:
+            if t.deadline in upcoming and t.status != "Done":
+                print(f"{p.name} -> {t.title} ({t.deadline})")
                 found = True
+
     if not found:
-        print("No tasks with near deadlines.")
+        print("No upcoming tasks.")
 
-def generate_report_file(today):
+
+def export_full_report():
     with open("report.txt", "w", encoding="utf-8") as f:
-        f.write("Project Status Summary:\n")
-        for proj in projects:
-            todo = sum(1 for t in proj.tasks if t.status == "ToDo")
-            in_progress = sum(1 for t in proj.tasks if t.status == "In Progress")
-            done = sum(1 for t in proj.tasks if t.status == "Done")
-            f.write(f"Project {proj.name}: ToDo: {todo}, In Progress: {in_progress}, Done: {done}\n")
-        
-        f.write("\nOverdue Tasks List:\n")
-        for proj in projects:
-            for task in proj.tasks:
-                if task.deadline < today and task.status != "Done":
-                    f.write(f"Project: {proj.name}, Title: {task.title}, Assignee: {task.assignee}, Deadline: {task.deadline}\n")
-        
-        f.write("\nMember Status:\n")
-        for member in team_members:
-            active = sum(1 for proj in projects for task in proj.tasks if task.assignee == member.name and task.status != "Done")
-            f.write(f"{member.name}: Active Tasks: {active}\n")
-    print("report.txt file generated successfully.")
+        f.write(f"Report generated on {TODAY}\n\n")
+        for p in projects:
+            total = len(p.tasks)
+            done = sum(1 for t in p.tasks if t.status == "Done")
+            f.write(f"{p.name}:done: {done} / total: {total}\n")
 
-if __name__ == "__main__":
-    print("Loading data from MongoDB...")
-    main_menu()
+    print("report.txt saved.")
+
+
+main_menu()

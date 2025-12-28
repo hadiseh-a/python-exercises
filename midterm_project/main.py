@@ -411,9 +411,10 @@ def Upcoming_task():
     found = False
     for p in projects:
         for t in p.tasks:
-            if today <= t.deadline <= limit and t.status != "Done":
-                print(f"name: {p.name} , \ntitle of project: {t.title} , \ndeadline:{t.deadline}")
-                found = True
+                deadline = datetime.date.fromisoformat(t.deadline)        
+                if today <= deadline <= limit and t.status != "Done":
+                     print(f"name: {p.name} , \ntitle of project: {t.title} , \ndeadline:{t.deadline}")
+                     found = True
 
     if not found:
         print("no tasks to do between these dates.")

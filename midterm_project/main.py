@@ -334,97 +334,100 @@ def show_tasks_for_member():
 def reports_menu():
     while True:
         print("\n--- Reports ---")
-        print("1) Overdue tasks")
-        print("2) Member summary")
-        print("3) Project status")
-        print("4) Upcoming tasks")
-        print("5) Export report")
+        print("1) Overdue task")
+        print("2) About Members")
+        print("3) Projects status")
+        print("4) Upcoming task")
+        print("5) print report")
         print("6) Back")
 
-        choice = input("Choose: ").strip()
+        choice = input("Choose: ").strip()   #حذف فاصله ها با استریپ
 
         if choice == "1":
-            report_overdue()
-        elif choice == "2":
-            report_member_summary()
+            overdue_task()
+        elif choice =="2":
+            About_members()
         elif choice == "3":
-            report_project_status()
+            Projects_status()
         elif choice == "4":
-            report_upcoming()
-        elif choice == "5":
-            export_full_report()
+            Upcoming_task()
+        elif choice =="5":
+            print_report()
         elif choice == "6":
             break
         else:
             print("Invalid choice.")
 
 
-def report_overdue():
+def overdue_task():  #گزارش تسک های عقب مانده
     found = False
     for p in projects:
         for t in p.tasks:
-            if t.deadline < TODAY and t.status != "Done":
+            if t.deadline <TODAY and t.status !="Done":
                 print(f"project name:{p.name} -> task title: {t.title} (deadline: {t.deadline})")
                 found = True
     if not found:
         print("No overdue tasks.")
 
 
-def report_member_summary():
-    member = choose_from_list(team_members, "Select member:", lambda m: m.name)
+def About_members(): #اطلاعات ممبر
+    member = choose_from_list(team_members, "Select member:", lambda m: m.name) #خط ۲۷ تیم ممبرز
     if member is None:
         return
 
-    todo = prog = done = 0
+    todo=0
+    inprog=0
+    done=0
     for p in projects:
         for t in p.tasks:
-            if t.assignee == member.name:
+            if t.assignee ==member.name:
                 if t.status == "ToDo":
                     todo += 1
                 elif t.status == "In Progress":
-                    prog += 1
+                    inprog += 1
                 else:
                     done += 1
 
-    print(f"ToDo: {todo}")
-    print(f"In Progress: {prog}")
-    print(f"Done: {done}")
+    print(f"ToDo:{todo}, task In Progress:{inprog}, Done:{done}")
 
 
-def report_project_status():
+
+
+def Projects_status():
     for p in projects:
-        total = len(p.tasks)
-        done = sum(1 for t in p.tasks if t.status == "Done")
-        print(f"{p.name}:done: {done}/total:{total}")
+        total =len(p.tasks)
+        done = 0
+        for t in p.tasks:
+            if t.status =="Done":
+                done +=1
+
+        print(f"{p.name}:\n done: {done} \n total:{total}")
 
 
-def report_upcoming():
+def Upcoming_task():
     today = datetime.date.today()
-    upcoming = [
-        (today + datetime.timedelta(days=i)).strftime("%Y-%m-%d")
-        for i in range(1, 4)
-    ]
+    limit = today + datetime.timedelta(days=3)
 
     found = False
     for p in projects:
         for t in p.tasks:
-            if t.deadline in upcoming and t.status != "Done":
-                print(f"{p.name} -> {t.title} ({t.deadline})")
+            if today <= t.deadline <= limit and t.status != "Done":
+                print(f"name: {p.name} , \ntitle of project: {t.title} , \ndeadline:{t.deadline}")
                 found = True
 
     if not found:
-        print("No upcoming tasks.")
+        print("no tasks to do between these dates.")
 
 
-def export_full_report():
-    with open("report.txt", "w", encoding="utf-8") as f:
-        f.write(f"Report generated on {TODAY}\n\n")
+
+def print_report():
+    with open("report.txt", "w", encoding="utf-8") as f: #انکدینگ برای ساپورت کردن هرنوع تکستی
+        f.write(f"Report for this date {TODAY}\n\n")
         for p in projects:
             total = len(p.tasks)
             done = sum(1 for t in p.tasks if t.status == "Done")
-            f.write(f"{p.name}:done: {done} / total: {total}\n")
+            f.write(f"{p.name}:\n done: {done} \n total:{total}")
 
-    print("report.txt saved.")
-
+    print("report is saved.")
 
 main_menu()

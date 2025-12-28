@@ -7,7 +7,7 @@ from db import (
 
 TODAY = datetime.date.today().strftime("%Y-%m-%d")
 
-team_members, projects = load_data()
+members, projects = load_data()
 
 
 def input_non_empty(message):
@@ -15,7 +15,6 @@ def input_non_empty(message):
     if text == "":
         return None
     return text
-
 
 def input_date(message):
     d = input(message).strip()
@@ -33,12 +32,12 @@ def choose_from_list(items, title, show_item_func):
     for i, item in enumerate(items, start=1):
         print(f"{i}. {show_item_func(item)}")
 
-    choice = input("Enter number: ").strip()
+    choice =input("Enter number: ").strip()
     if not choice.isdigit():
         print("Invalid input.")
         return None
 
-    idx = int(choice)
+    idx= int(choice)
     if idx < 1 or idx > len(items):
         print("Invalid number.")
         return None
@@ -48,150 +47,155 @@ def choose_from_list(items, title, show_item_func):
 
 def find_project_by_name(name):
     for p in projects:
-        if p.name == name:
+        if p.name== name:
             return p
     return None
 
 #Zeynab Nezami
 
-def main_menu():
+def main_menu():#منو اصلی
     while True:
-        print("\n" + "=" * 40)
-        print("   PROJECT MANAGEMENT SYSTEM")
-        print("=" * 40)
-        print("1) Team members")
-        print("2) Projects")
-        print("3) Tasks")
-        print("4) Reports")
-        print("5) Exit")
+        print("\n ===PROJECT MANAGEMENT SYSTEM===   ")
+        print ("1 Team members")
+        print ("2 Projects")
+        print ("3 Tasks")
+        print ("4 Reports")
+        print ("5 Exit" )
 
-        choice = input("Choose: ").strip()
+        c = input("Choose: ").strip()
 
-        if choice == "1":
+        if c== "1":
             team_menu()
-        elif choice == "2":
-            projects_menu()
-        elif choice == "3":
+        elif c == "2":
+            proj_menu()
+        elif c== "3":
             tasks_menu()
-        elif choice == "4":
+        elif c == "4":
             reports_menu()
-        elif choice == "5":
+        elif c == "5":
             print("Goodbye!")
             break
         else:
             print("Invalid choice.")
 
 
-def team_menu():
+def team_menu():#بخش اول پروژه مدیریت اعضای تیم
     while True:
-        print("\n--- Team Members ---")
-        print("1) Add member")
-        print("2) Show members")
-        print("3) Back")
+        print("\n-Team Members...")
+        print("1. Add member")
+        print("2. Show members")
+        print("3. Back")
 
-        choice = input("Choose: ").strip()
+        b = input("Choose: ").strip()
 
-        if choice == "1":
+        if b == "1":
             add_member()
-        elif choice == "2":
+        elif b == "2":
             show_members()
-        elif choice == "3":
+        elif b== "3":
             break
         else:
-            print("Invalid choice.")
+            print("Invalid input.")
 
 
 def add_member():
-    name = input_non_empty("Name: ")
-    if name is None:
-        print("Name is required.")
+    name=input("Name: ")
+    if name ==" " :
+        print("Name cant be empty.")
         return
 
-    role = input("Role: ").strip()
-    if role == "":
-        role = "Not specified"
+    role =input("Role: ").strip()
+    if role== "":
+        role = "not ture"
 
-    email = input("Email: ").strip()
+    email= input("Email: ").strip()
 
-    member = TeamMember(name, role, email)
+    member =TeamMember(name , role, email)
     save_member(member)
-    team_members.append(member)
+    members.append(member)
 
-    print("Member added.")
+    print("Member added succesfully")
 
-
-def show_members():
-    if not team_members:
-        print("No members found.")
-        return
-
-    for i, m in enumerate(team_members, start=1):
+def show_members():#نمایش اعضا
+    if len( members)== 0:
+        print("No members found")
+        return 
+    for i, m in enumerate(members, start=1):
         print(f"{i}.name: {m.name} |role: {m.role} |email: {m.email}")
 
 
-def projects_menu():
-    while True:
-        print("\n--- Projects ---")
-        print("1) Create project")
-        print("2) Show projects")
-        print("3) Back")
 
-        choice = input("Choose: ").strip()
 
-        if choice == "1":
-            create_project()
-        elif choice == "2":
-            show_projects()
-        elif choice == "3":
+def proj_menu():#بخش دوم مدیریت پروژه
+    while True :
+        print("\n-Projects...")
+        print("1. Create project")
+        print("2.  Show projects")
+        print("3. Back")
+
+        a =input("please Choose one: ").strip()
+        if a=="1":
+            create_proj()
+        elif a =="2":
+            show_proj()
+        elif a== "3":
             break
         else:
-            print("Invalid choice.")
-
-
-def create_project():
-    if not team_members:
-        print("Add a team member first.")
+            print("your choose is not valid")
+def create_proj():
+    if not members :
+        print("Add a team member first")
         return
 
-    pname = input_non_empty("Project name: ")
-    if pname is None:
-        print("Project name is required.")
+    pname =input("Project name: ")
+    if pname ==" ":
+        print("Project name can be null")
         return
 
-    desc = input("Description: ").strip()
-    if desc == "":
+    desc= input ("Description: ").strip()
+    if desc== " ":
         desc = "(no description)"
 
-    manager = choose_from_list(
-        team_members,
-        "Select project manager:",
-        lambda m: f"{m.name} ({m.role})"
-    )
-    if manager is None:
+    print("Select project manager:")
+    for i, m in enumerate(members, start=1):
+        print(f"{i}. {m.name} ({m.role})")
+    try:
+        num =int(input("Enter number: "))
+        manager= members[num - 1]
+    except:
+        print("Invalid choice")
         return
 
-    start = input_date("Start date (YYYY-MM-DD): ")
-    end = input_date("End date (YYYY-MM-DD): ")
-    if start is None or end is None or start > end:
-        print("Invalid date.")
+    start=input("Start date (YYYY-MM-DD): ")
+    end=input("End date (YYYY-MM-DD): ")
+
+    try:#چک میکنه که تاریخ پایان زوددتر از تاریخ شروع نباشه
+        start= datetime.date.fromisoformat(start)
+        end= datetime.date.fromisoformat(end)
+    except:
+        print("Wrong date format")
         return
 
-    project = Project(pname, desc, manager.name, start, end)
+    if start > end:
+        print("your date in not true")
+        return
+
+    project= Project(pname, desc, manager.name, start, end)
     save_project(project)
     projects.append(project)
 
     print("Project created.")
-
-
-def show_projects():
+def show_proj():
     if not projects:
-        print("No projects found.")
+        print ("there is not any project.")
         return
 
-    for i, p in enumerate(projects, start=1):
-        print(f"{i}.name: {p.name} | Manager: {p.manager}")
-        print(f"description:  {p.description}")
+    for i, p in enumerate(projects, start=1) :
+        print (f"{i}.name: {p.name} | Manager: {p.manager}" )
+        print (f"description:  {p.description}")
         print(f"deadline:  {p.start_date} -> {p.end_date}")
+
+
 
 #Narges
 
@@ -237,11 +241,11 @@ def add_task():
     if desc == "":
         desc = "None"
 
-    assignee = choose_from_list(team_members, "Select assignee:", lambda m: m.name)
+    assignee = choose_from_list(members, "Select assignee:", lambda m: m.name)
     if assignee is None:
         return
 
-    deadline = input_date("Deadline (YYYY-MM-DD): ")
+    deadline= input_date("Deadline (YYYY-MM-DD): ")
     if deadline is None:
         print("Invalid date.")
         return
@@ -291,7 +295,7 @@ def reassign_task():
     if project is None:
         return
 
-    member = choose_from_list(team_members, "Select new assignee:", lambda m: m.name)
+    member = choose_from_list(members, "Select new assignee:", lambda m: m.name)
     if member is None:
         return
 
@@ -315,7 +319,7 @@ def show_tasks_for_project():
 
 
 def show_tasks_for_member():
-    member = choose_from_list(team_members, "Select member:", lambda m: m.name)
+    member = choose_from_list(members, "Select member:", lambda m: m.name)
     if member is None:
         return
 
@@ -371,7 +375,7 @@ def overdue_task():  #گزارش تسک های عقب مانده
 
 
 def About_members(): #اطلاعات ممبر
-    member = choose_from_list(team_members, "Select member:", lambda m: m.name) #خط ۲۷ تیم ممبرز
+    member = choose_from_list(members, "Select member:", lambda m: m.name) #خط ۲۷ تیم ممبرز
     if member is None:
         return
 

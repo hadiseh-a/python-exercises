@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from models import Member, Project, Task
+from models import TeamMember, Project, Task
 
 MONGO_URI = "mongodb+srv://hadisea82:jwtDaLN2SUBpKLt@cluster0.vmincra.mongodb.net/" 
 
@@ -16,7 +16,7 @@ def load_data():
     tasks=[]
 
     for doc in members_col.find():
-        members.append(Member(
+        members.append(TeamMember(
             name=doc["name"],
             role=doc["role"],
             email=doc["email"]
@@ -47,7 +47,7 @@ def load_data():
     return members, projects,tasks
 
 
-def save_member(member: Member):
+def save_member(member: TeamMember):
     members_col.insert_one({
         "name": member.name,
         "role":member.role,

@@ -13,6 +13,7 @@ tasks_col = db["tasks"]
 def load_data():
     members = []
     projects = []
+    tasks=[]
 
     for doc in members_col.find():
         members.append(TeamMember(
@@ -39,10 +40,11 @@ def load_data():
                 status=task_doc.get("status", "ToDo")
             )
             project.tasks.append(task)
+            tasks.append(task)
 
         projects.append(project)
 
-    return members, projects
+    return members, projects,tasks
 
 
 def save_member(member: TeamMember):

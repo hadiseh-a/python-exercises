@@ -7,20 +7,8 @@ from db import (
 
 TODAY = datetime.date.today().strftime("%Y-%m-%d")
 
-members, projects = load_data()
+members, projects,tasks = load_data()
 
-
-def input_non_empty(message):
-    text = input(message).strip()
-    if text == "":
-        return None
-    return text
-
-def input_date(message):
-    d = input(message).strip()
-    if len(d) != 10:
-        return None
-    return d
 
 
 def choose_from_list(items, title, show_item_func):
@@ -69,7 +57,7 @@ def main_menu():#منو اصلی
         elif c == "2":
             proj_menu()
         elif c== "3":
-            tasks_menu()
+            task_menu()
         elif c == "4":
             reports_menu()
         elif c == "5":
@@ -166,8 +154,8 @@ def create_proj():
         print("Invalid choice")
         return
 
-    start=input("Start date (YYYY-MM-DD): ")
-    end=input("End date (YYYY-MM-DD): ")
+    start_input=input("Start date (YYYY-MM-DD): ").strip()
+    end_input=input("End date (YYYY-MM-DD): ").strip()
 
     try:#چک میکنه که تاریخ پایان زوددتر از تاریخ شروع نباشه
         start= datetime.date.fromisoformat(start)
@@ -180,7 +168,7 @@ def create_proj():
         print("your date in not true")
         return
 
-    project= Project(pname, desc, manager.name, start, end)
+    project= Project(pname, desc, manager.name, start_input, end_input)
     save_project(project)
     projects.append(project)
 
@@ -199,142 +187,94 @@ def show_proj():
 
 #Narges
 
-def tasks_menu():
+def task_menu():
     while True:
-        print("\n--- Tasks ---")
-        print("1) Add task")
-        print("2) Change status")
-        print("3) Reassign task")
-        print("4) Project tasks")
-        print("5) Member tasks")
-        print("6) Back")
-
-        choice = input("Choose: ").strip()
-
+        print("\nTask Management")
+        print("1. Add new task")
+        print("2. Change task status")
+        print("3. Change task assignee")
+        print("4. Show all tasks")
+        print("5. Exit")
+        choice = input("please select an option:").strip()
         if choice == "1":
             add_task()
         elif choice == "2":
             change_task_status()
         elif choice == "3":
-            reassign_task()
+            change_task_assignee()
         elif choice == "4":
-            show_tasks_for_project()
+            list_tasks()
         elif choice == "5":
-            show_tasks_for_member()
-        elif choice == "6":
             break
         else:
-            print("Invalid choice.")
+            print("the selected option is not correct!! chosse anoither one!!")
 
 
 def add_task():
-    project = choose_from_list(projects, "Select project:", lambda p: p.name)
-    if project is None:
+    title = input("title: ")
+    desc = input("information: ")
+    assignee = input("assignee: ")
+    deadline = input("deadline (YYYY-MM-DD): ")
+    status = input("status (todo/in progress/done): ")
+
+    #database
+    project = choose_from_list(projects, "Select Project", lambda p: p.name)
+    if not project:
         return
+    save_task(task,project_name=project.name)
+    #--------
 
-    title = input_non_empty("Task title: ")
-    if title is None:
-        print("Task title is required.")
-        return
-
-    desc = input("Description: ").strip()
-    if desc == "":
-        desc = "None"
-
-    assignee = choose_from_list(members, "Select assignee:", lambda m: m.name)
-    if assignee is None:
-        return
-
-    deadline= input_date("Deadline (YYYY-MM-DD): ")
-    if deadline is None:
-        print("Invalid date.")
-        return
-
-    status = input("Status [ToDo]: ").strip()
-    if status not in ["ToDo", "In Progress", "Done"]:
-        status = "ToDo"
-
-    task = Task(title, desc, assignee.name, deadline, status)
-    save_task(task, project.name)
+    task = Task(title, desc, assignee, deadline, status)
     project.tasks.append(task)
-
-    print("Task added.")
-
-
-def pick_task():
-    project = choose_from_list(projects, "Select project:", lambda p: p.name)
-    if project is None or not project.tasks:
-        return None, None
-
-    task = choose_from_list(
-        project.tasks,
-        "Select task:",
-        lambda t: f"title: {t.title} |assignee: {t.assignee} |status: {t.status}"
-    )
-    return project, task
-
+    
+    print("task added:", task.title)
 
 def change_task_status():
-    project, task = pick_task()
-    if project is None:
+    if not tasks:
+        print("there is not status!!!!")
         return
-
-    status = input("New status: ToDo, In Progress, Done ").strip()
-    if status not in ["ToDo", "In Progress", "Done"]:
-        print("Invalid status.")
+    for i, t in enumerate(tasks):
+        print(i, t.title, "-", t.status)
+    index = int(input("task number to change status: "))
+    new_status = input("new status (todo/in progress/done)(please choosee): ")
+    tasks[index].change_status(new_status)
+    #database
+    task = tasks[index]
+    proj = choose_from_list(projects, "Select Project", lambda p: p.name)
+    if not proj or not proj.tasks:
         return
+    update_task_status(proj.name, task.title, new_status)
 
-    task.status = status
-    update_task_status(project.name, task.title, status)
+    print("status changed:", tasks[index])
 
-    print("Status updated.")
-
-
-def reassign_task():
-    project, task = pick_task()
-    if project is None:
+def change_task_assignee():
+    if not tasks:
+        print("there is not assignee!!!!")
         return
-
-    member = choose_from_list(members, "Select new assignee:", lambda m: m.name)
-    if member is None:
+    for i, t in enumerate(tasks):
+        print(i, t.title, "-", t.assignee)
+    index = int(input("task number to change assignee(please enter!!): "))
+    new_assignee = input("new assignee: ")
+    tasks[index].change_assignee(new_assignee)
+    #database
+    task = tasks[index]
+    proj = choose_from_list(projects, "Select Project", lambda p: p.name)
+    if not proj or not proj.tasks:
         return
+    update_task_assignee(proj.name, task.title, new_assignee)
+    
 
-    task.assignee = member.name
-    update_task_assignee(project.name, task.title, member.name)
+    print("assignee changed:", tasks[index])
 
-    print("Task reassigned.")
-
-
-def show_tasks_for_project():
-    project = choose_from_list(projects, "Select project:", lambda p: p.name)
-    if project is None:
+def list_tasks():
+    if not tasks:
+        print("no tasks exist.")
         return
-
-    if not project.tasks:
-        print("No tasks found.")
-        return
-
-    for t in project.tasks:
-        print(f"title: {t.title} |assignee: {t.assignee} |deadline: {t.deadline} |status: {t.status}")
+    for i, t in enumerate(tasks):
+        print(f"{i}: {t}")
 
 
-def show_tasks_for_member():
-    member = choose_from_list(members, "Select member:", lambda m: m.name)
-    if member is None:
-        return
-
-    found = False
-    for p in projects:
-        for t in p.tasks:
-            if t.assignee == member.name:
-                print(f"[project name: {p.name}] task title: {t.title} |task deadline: {t.deadline} |task status: {t.status}")
-                found = True
-
-    if not found:
-        print("No tasks found.")
-
-#Setayesh Mokhtari
- 
+# Setayesh Mokhtari
 def reports_menu():
     while True:
         print("\n--- Reports ---")

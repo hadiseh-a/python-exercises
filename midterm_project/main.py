@@ -11,14 +11,14 @@ members, projects,tasks = load_data()
 
 
 
-def choose_from_list(items, title, show_item_func):
+def choose_from_list(items, title, show_item):
     if not items:
         print("List is empty.")
         return None
 
     print("\n" + title)
     for i, item in enumerate(items, start=1):
-        print(f"{i}. {show_item_func(item)}")
+        print(f"{i}. {show_item(item)}")
 
     choice =input("Enter number: ").strip()
     if not choice.isdigit():
@@ -31,6 +31,9 @@ def choose_from_list(items, title, show_item_func):
         return None
 
     return items[idx - 1]
+
+def get_name(item):
+    return item.name
 
 
 def find_project_by_name(name):
@@ -217,15 +220,15 @@ def add_task():
     deadline = input("deadline (YYYY-MM-DD): ")
     status = input("status (todo/in progress/done): ")
 
-    #database
-    project = choose_from_list(projects, "Select Project", lambda p: p.name)
+    project = choose_from_list(projects, "Select Project", get_name)
     if not project:
         return
-    save_task(task,project_name=project.name)
-    #--------
 
     task = Task(title, desc, assignee, deadline, status)
     project.tasks.append(task)
+    #database
+    save_task(task,project_name=project.name)
+
     
     print("task added:", task.title)
 
@@ -240,7 +243,7 @@ def change_task_status():
     tasks[index].change_status(new_status)
     #database
     task = tasks[index]
-    proj = choose_from_list(projects, "Select Project", lambda p: p.name)
+    proj = choose_from_list(projects, "Select Project", get_name)
     if not proj or not proj.tasks:
         return
     update_task_status(proj.name, task.title, new_status)
@@ -258,7 +261,7 @@ def change_task_assignee():
     tasks[index].change_assignee(new_assignee)
     #database
     task = tasks[index]
-    proj = choose_from_list(projects, "Select Project", lambda p: p.name)
+    proj = choose_from_list(projects, "Select Project", get_name)
     if not proj or not proj.tasks:
         return
     update_task_assignee(proj.name, task.title, new_assignee)
@@ -314,8 +317,10 @@ def overdue_task():  #گزارش تسک های عقب مانده
         print("No overdue tasks.")
 
 
-def About_members(): #اطلاعات ممبر
-    member = choose_from_list(members, "Select member:", lambda m: m.name) #خط ۲۷ تیم ممبرز
+
+
+def About_members(): 
+    member = choose_from_list(members, "Select member:", get_name) #خط ۲۷ تیم ممبرز
     if member is None:
         return
 
@@ -370,8 +375,11 @@ def print_report():
         f.write(f"Report for this date {TODAY}\n\n")
         for p in projects:
             total = len(p.tasks)
-            done = sum(1 for t in p.tasks if t.status == "Done")
-            f.write(f"{p.name}:\n done: {done} \n total:{total}")
+            done = 0
+            for t in p.tasks:
+                if t.status =="Done":
+                    done +=1
+            f.write(f"project name :{p.name}:\n tasks done: {done} \n total tasks:{total} \n")
 
     print("report is saved.")
 

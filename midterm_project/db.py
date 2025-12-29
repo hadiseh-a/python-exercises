@@ -37,7 +37,7 @@ def load_data():
                 description=task_doc["description"],
                 assignee=task_doc["assignee"],
                 deadline=task_doc["deadline"],
-                status=task_doc.get("status", "ToDo")
+                status=task_doc["status"]
             )
             project.tasks.append(task)
             tasks.append(task)
@@ -47,7 +47,7 @@ def load_data():
     return members, projects,tasks
 
 
-def save_member(member: TeamMember):
+def save_member(member):
     members_col.insert_one({
         "name": member.name,
         "role":member.role,
@@ -55,7 +55,7 @@ def save_member(member: TeamMember):
         })
 
 
-def save_project(project: Project):
+def save_project(project):
     projects_col.insert_one({
         "name": project.name,
         "description": project.description,
@@ -65,7 +65,7 @@ def save_project(project: Project):
     })
 
 
-def save_task(task: Task, project_name: str):
+def save_task(task, project_name):
     tasks_col.insert_one({
         "project_name": project_name,
         "title": task.title,
@@ -76,14 +76,14 @@ def save_task(task: Task, project_name: str):
     })
 
 
-def update_task_status(project_name: str, task_title: str, new_status: str):
+def update_task_status(project_name, task_title, new_status):
     tasks_col.update_one(
         {"project_name": project_name, "title": task_title},
         {"$set": {"status": new_status}}
     )
 
 
-def update_task_assignee(project_name: str, task_title: str, new_assignee: str):
+def update_task_assignee(project_name, task_title, new_assignee):
     tasks_col.update_one(
         {"project_name": project_name, "title": task_title},
         {"$set": {"assignee": new_assignee}}

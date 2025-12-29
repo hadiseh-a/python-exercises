@@ -1,5 +1,5 @@
-from .team_member import TeamMember
+from .member import Member
 from .project import Project
 from .task import Task
 
-__all__ = ["TeamMember", "Project", "Task"]
+__all__ = ["Member", "Project", "Task"]

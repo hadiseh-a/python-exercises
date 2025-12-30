@@ -6,6 +6,8 @@ employees = []
 
 # سطل زباله برای حذف‌شده‌ها
 trash_bin = []
+npx create-next-app@latest
+
 
 # پشته‌های Undo و Redo
 undo_stack = []

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Project Management App</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+<div class="container my-4">
+  <h1 class="text-center mb-4">📊 Project Management System</h1>
+
+  <!-- Team Members -->
+  <div class="card mb-3">
+    <div class="card-header">👥 Team Members</div>
+    <div class="card-body">
+      <input id="memberName" class="form-control mb-2" placeholder="Name">
+      <input id="memberRole" class="form-control mb-2" placeholder="Role">
+      <input id="memberEmail" class="form-control mb-2" placeholder="Email">
+      <button class="btn btn-primary" onclick="addMember()">Add Member</button>
+      <ul id="membersList" class="list-group mt-3"></ul>
+    </div>
+  </div>
+
+  <!-- Projects -->
+  <div class="card mb-3">
+    <div class="card-header">📁 Projects</div>
+    <div class="card-body">
+      <input id="projectName" class="form-control mb-2" placeholder="Project Name">
+      <input id="projectDesc" class="form-control mb-2" placeholder="Description">
+      <select id="projectManager" class="form-control mb-2"></select>
+      <input id="startDate" type="date" class="form-control mb-2">
+      <input id="endDate" type="date" class="form-control mb-2">
+      <button class="btn btn-success" onclick="addProject()">Add Project</button>
+      <ul id="projectsList" class="list-group mt-3"></ul>
+    </div>
+  </div>
+
+  <!-- Tasks -->
+  <div class="card mb-3">
+    <div class="card-header">✅ Tasks</div>
+    <div class="card-body">
+      <input id="taskTitle" class="form-control mb-2" placeholder="Task Title">
+      <input id="taskDesc" class="form-control mb-2" placeholder="Task Description">
+      <select id="taskProject" class="form-control mb-2"></select>
+      <select id="taskMember" class="form-control mb-2"></select>
+      <input id="taskDeadline" type="date" class="form-control mb-2">
+      <select id="taskStatus" class="form-control mb-2">
+        <option>ToDo</option>
+        <option>In Progress</option>
+        <option>Done</option>
+      </select>
+      <button class="btn btn-warning" onclick="addTask()">Add Task</button>
+      <ul id="tasksList" class="list-group mt-3"></ul>
+    </div>
+  </div>
+
+  <!-- Reports -->
+  <div class="card">
+    <div class="card-header">📄 Reports</div>
+    <div class="card-body">
+      <button class="btn btn-danger mb-2" onclick="showOverdue()">Overdue Tasks</button>
+      <button class="btn btn-info mb-2" onclick="memberReport()">Member Report</button>
+      <button class="btn btn-secondary mb-2" onclick="projectSummary()">Project Summary</button>
+      <button class="btn btn-dark mb-2" onclick="generateReport()">Generate Text Report</button>
+      <pre id="reportOutput" class="report-box mt-3"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="app.js"></script>
+</body>
+</html>

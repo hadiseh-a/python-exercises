@@ -1,0 +1,23 @@
+body {
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.card-header {
+  font-weight: bold;
+}
+
+.report-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  min-height: 120px;
+  white-space: pre-line;
+}
+
+button {
+  min-width: 180px;
+}

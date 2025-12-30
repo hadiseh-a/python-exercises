@@ -5,7 +5,7 @@ export default function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
       <Link className="navbar-brand fw-bold" href="/">
-        📊 PMS
+        project manager
       </Link>
 
       <div className="navbar-nav">

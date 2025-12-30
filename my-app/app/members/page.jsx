@@ -23,7 +23,7 @@ export default function MembersPage() {
 
   return (
     <div>
-      <h2>👥 Members</h2>
+      <h2> Members</h2>
       <form className="row g-3 mb-3" onSubmit={addMember}>
         <div className="col-md-4">
           <input

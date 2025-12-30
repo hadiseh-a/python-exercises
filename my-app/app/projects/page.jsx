@@ -23,7 +23,7 @@ export default function ProjectsPage() {
 
   return (
     <div>
-      <h2>📁 Projects</h2>
+      <h2> Projects</h2>
       <form className="row g-3 mb-3" onSubmit={addProject}>
         <div className="col-md-4">
           <input

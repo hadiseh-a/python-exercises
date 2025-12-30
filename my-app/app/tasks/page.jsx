@@ -46,7 +46,7 @@ export default function TasksPage() {
 
   return (
     <div>
-      <h2>✅ Tasks</h2>
+      <h2> Tasks</h2>
       <form className="row g-3 mb-3" onSubmit={addTask}>
         <div className="col-md-3">
           <input

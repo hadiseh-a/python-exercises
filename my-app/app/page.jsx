@@ -7,7 +7,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2 className="mb-4">📊 Dashboard</h2>
+      <h2 className="mb-4"> Dashboard</h2>
       <div className="row g-3 mb-4">
         <div className="col-md-4">
           <div className="card text-center shadow-sm">

@@ -1,6 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body, input, select, textarea, button {
+  font-family: 'Inter', sans-serif;
+}
+
 body {
   background-color: #f4f7fc;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
 }
 
 .navbar {
@@ -15,15 +21,6 @@ body {
 .card {
   border-radius: 1rem;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.card-title {
-  font-weight: 600;
-}
-
-.list-group-item {
-  border-radius: 0.75rem;
-  margin-bottom: 0.5rem;
 }
 
 .btn-primary {
@@ -41,8 +38,12 @@ body {
   border-radius: 0.5rem;
 }
 
+.list-group-item {
+  border-radius: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
 h2 {
   font-weight: 700;
-  color: #333;
   margin-bottom: 1.5rem;
 }

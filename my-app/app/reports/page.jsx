@@ -15,7 +15,7 @@ export default function ReportsPage() {
 
   return (
     <div>
-      <h2>📄 Reports</h2>
+      <h2> Reports</h2>
 
       <h5>Overdue Tasks</h5>
       {overdue.length === 0 ? (
